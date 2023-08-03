@@ -1,6 +1,6 @@
 {
-    "name": "mindef/caal_proyecto1",
-    "description": "Primer Proyecto MVC",
+    "name": "mindef/proyecto1",
+    "description": "Primer proyecto MVC",
     "type": "project",
     "config": {
         "platform-check": false

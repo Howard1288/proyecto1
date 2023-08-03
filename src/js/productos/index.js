@@ -1,12 +1,11 @@
 import { Dropdown } from "bootstrap";
 import Swal from "sweetalert2";
-import { validarFormulario, Toast} from "../funciones";
+import { validarFormulario, Toast, confirmacion} from "../funciones";
 
 const formulario = document.querySelector('form')
 const tablaProductos = document.getElementById('tablaProductos');
 const btnBuscar = document.getElementById('btnBuscar');
 const btnModificar = document.getElementById('btnModificar');
-const btnEliminar = document.getElementById('btnEliminar');
 const btnGuardar = document.getElementById('btnGuardar');
 const btnCancelar = document.getElementById('btnCancelar');
 const divTabla = document.getElementById('divTabla');
@@ -28,7 +27,7 @@ const guardar = async (evento) => {
 
     const body = new FormData(formulario)
     body.delete('producto_id')
-    const url = '/caal_proyecto1/API/productos/guardar';
+    const url = '/proyecto1/API/productos/guardar';
     const config = {
         method : 'POST',
         // body: otroNombre
@@ -74,7 +73,7 @@ const buscar = async () => {
 
     let producto_nombre = formulario.producto_nombre.value;
     let producto_precio = formulario.producto_precio.value;
-    const url = `/caal_proyecto1/API/productos/buscar?producto_nombre=${producto_nombre}&producto_precio=${producto_precio}`;
+    const url = `/proyecto1/API/productos/buscar?producto_nombre=${producto_nombre}&producto_precio=${producto_precio}`;
     const config = {
         method : 'GET'
     }
@@ -82,7 +81,6 @@ const buscar = async () => {
     try {
         const respuesta = await fetch(url, config)
         const data = await respuesta.json();
-        console.log(data)
         
         tablaProductos.tBodies[0].innerHTML = ''
         const fragment = document.createDocumentFragment();
@@ -178,10 +176,9 @@ const modificar = async () => {
         alert('Debe llenar todos los campos');
         return 
     }
-    const producto_id = formulario.producto_id.value;
 
     const body = new FormData(formulario)
-    const url = `/caal_proyecto1/API/productos/modificar?producto_id=${producto_id}`;
+    const url = '/proyecto1/API/productos/modificar';
     const config = {
         method : 'POST',
         body
@@ -193,15 +190,17 @@ const modificar = async () => {
         const data = await respuesta.json();
         
         const {codigo, mensaje,detalle} = data;
-
+        let icon = 'info'
         switch (codigo) {
             case 1:
                 formulario.reset();
+                icon = 'success'
                 buscar();
                 cancelarAccion();
                 break;
         
             case 0:
+                icon = 'error'
                 console.log(detalle)
                 break;
         
@@ -209,64 +208,58 @@ const modificar = async () => {
                 break;
         }
 
-        alert(mensaje);
+        Toast.fire({
+            icon,
+            text: mensaje
+        })
 
     } catch (error) {
         console.log(error);
     }
 }
 
-const eliminar = async (producto_id) => {
-    const confirmacion = await Swal.fire({
-        icon: 'question',
-        title: '¿Estás seguro?',
-        text: '¿Deseas eliminar este registro?',
-        showCancelButton: true,
-    });
-
-    if (confirmacion.isConfirmed) {
-    const url = '/caal_proyecto1/API/productos/guardar';
-    const body = new FormData();
-    body.append('producto_id', producto_id);
-    body.append('tipo', 3); // Establece 'tipo' como 3 para la solicitud de eliminar
-
-    const config = {
-        method: 'POST', // Debe ser 'POST' para la solicitud de eliminar
-        body,
-    };
-
-    try {
-        const respuesta = await fetch(url, config);
-        const data = await respuesta.json();
-
-        const { codigo, mensaje, detalle } = data;
-
-        switch (codigo) {
-            case 1:
-                formulario.reset();
-                buscar();
-                break;
-        
-            case 0:
-                console.log(detalle)
-                break;
-        
-            default:
-                break;
+const eliminar = async (id) => {
+    if(await confirmacion('warning','¿Desea eliminar este registro?')){
+        const body = new FormData()
+        body.append('producto_id', id)
+        const url = '/proyecto1/API/productos/eliminar';
+        const config = {
+            method : 'POST',
+            body
         }
-
-        Swal.fire({
-            icon: 'success',
-            title: 'exito',
-            text:mensaje,
-        });
-    } catch (error) {
-        console.log(error);
+        try {
+            const respuesta = await fetch(url, config)
+            const data = await respuesta.json();
+            console.log(data)
+            const {codigo, mensaje,detalle} = data;
+    
+            let icon = 'info'
+            switch (codigo) {
+                case 1:
+                    icon = 'success'
+                    buscar();
+                    break;
+            
+                case 0:
+                    icon = 'error'
+                    console.log(detalle)
+                    break;
+            
+                default:
+                    break;
+            }
+    
+            Toast.fire({
+                icon,
+                text: mensaje
+            })
+    
+        } catch (error) {
+            console.log(error);
+        }
     }
-}
 }
 buscar();
-
 formulario.addEventListener('submit', guardar )
 btnBuscar.addEventListener('click', buscar)
 btnCancelar.addEventListener('click', cancelarAccion)

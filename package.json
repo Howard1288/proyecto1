@@ -1,7 +1,7 @@
 {
-  "name": "caal_proyecto1",
+  "name": "proyecto1",
   "version": "1.0.0",
-  "description": "Primer Proyecto MVC",
+  "description": "Primer proyecto MVC",
   "main": "index.js",
   "scripts": {
     "build": "webpack",

@@ -1,2 +1,2 @@
-<h1>PRUEBA DESDE LA VISTA</h1>
+<h1>HOla mundo desde la vista</h1>
 <h2><?= $cosa  ?></h2>
