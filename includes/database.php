@@ -1,5 +1,6 @@
 <?php
 
+
 try {
     $host = $_ENV['DB_HOST'];
     $service = $_ENV['DB_SERVICE'];
